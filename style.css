@@ -97,29 +97,38 @@ h2 {
   border-radius: 5px;
 }
 
+/* ✅ Updated form styles */
 form {
+  max-width: 500px;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1rem;
+}
+
+label {
+  font-weight: bold;
 }
 
 input, textarea {
   padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
 button {
-  padding: 10px;
-  background: #0072ff;
+  background-color: #007bff;
   color: white;
   border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
-  border-radius: 5px;
 }
 
 button:hover {
-  background: #005ad3;
+  background-color: #0056b3;
 }
 
 footer {
