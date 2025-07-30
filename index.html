@@ -57,12 +57,21 @@
 
   <section id="contact">
     <h2>Contact Me</h2>
-    <form action="https://formspree.io/f/mdkddnaa" method="POST">
-      <input type="text" name="name" placeholder="Your name" required />
-      <input type="email" name="email" placeholder="Your email" required />
-      <textarea name="message" placeholder="Your message..." required></textarea>
-      <button type="submit">Send</button>
-    </form>
+    <form
+  action="https://formspree.io/f/mdkddnaa"
+  method="POST"
+>
+  <label>
+    Your email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Your message:
+    <textarea name="message"></textarea>
+  </label>
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>
   </section>
 
   <footer>
