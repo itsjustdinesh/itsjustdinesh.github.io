@@ -39,20 +39,38 @@
 <section id="projects">
   <h2>Projects</h2>
 
-  <!-- WRAP the card in an anchor. Use absolute URL if needed. -->
-  <a href="/projects/pricepilot/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
-    <div class="project-card" style="cursor:pointer; position:relative; z-index:5;">
-      <img src="assets/project1.jpg" alt="PricePilot demo" style="width:100%; border-radius:8px; max-width:300px; display:block;"/>
-      <h3>PricePilot</h3>
-      <p>An AI-powered price comparison demo that helps users find the best deals online.</p>
-      <div style="display:inline-block; margin-top:8px; padding:8px 10px; border-radius:8px; background:#06b6d4; color:white;">
-        Open live demo
+  <div class="project-card" style="display:flex;gap:18px;align-items:flex-start;">
+    <!-- left: image -->
+    <img src="assets/project1.jpg" alt="PricePilot demo screenshot" style="width:140px;height:100px;object-fit:cover;border-radius:8px;flex:0 0 140px" />
+
+    <!-- right: description -->
+    <div style="flex:1">
+      <h3 style="margin:0 0 6px 0">PricePilot</h3>
+
+      <p style="margin:0 0 8px 0; color:#374151;">
+        <strong>Problem:</strong> Users waste time opening multiple quick-commerce apps (Zepto, Blinkit, BigBasket) to compare prices for everyday items — leading to confusion and missed savings.
+      </p>
+
+      <p style="margin:0 0 8px 0; color:#374151;">
+        <strong>Solution:</strong> A lightweight web demo that accepts item + quantity + location and displays sorted prices (lowest → highest) across marketplaces with direct links to each marketplace search.
+      </p>
+
+      <p style="margin:0 0 8px 0; color:#374151;">
+        <strong>Tech stack:</strong> HTML, CSS, JavaScript (vanilla). Design & UI are static and hosted on GitHub Pages. Data is demo-driven (editable JSON) — backend & scraping logic were prototyped separately using Python/C++ in the project plan.
+      </p>
+
+      <p style="margin:0 0 12px 0; color:#374151;">
+        <strong>Impact:</strong> Demonstrates product thinking, frontend engineering, and algorithmic sorting to surface actionable choices quickly — ideal for portfolios & admissions review.
+      </p>
+
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="/projects/pricepilot/" target="_blank" rel="noopener noreferrer" style="background:#06b6d4;color:white;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;">Open live demo</a>
+        <a href="https://github.com/your-username/your-repo/tree/main/projects/pricepilot" target="_blank" rel="noopener noreferrer" style="color:#065f46;text-decoration:underline;font-size:14px;">Source (GitHub)</a>
       </div>
     </div>
-  </a>
-
-  <!-- other project-cards... -->
+  </div>
 </section>
+
 
 
 
