@@ -108,21 +108,18 @@
     try {
       // sample dataset
       // Use these templates in your PRICES object
-const TEMPLATE_EXAMPLES = {
-  bigbasket:   "https://www.bigbasket.com/catalogsearch/result/?q={query}",
-  zepto:       "https://www.zepto.com/search?q={query}",            // sometimes zepto uses zepto.co / .in -> test and adjust
-  blinkit:     "https://www.blinkit.com/search?query={query}",
-  amazon_in:   "https://www.amazon.in/s?k={query}",
-  flipkart:    "https://www.flipkart.com/search?q={query}",
-  myntra:      "https://www.myntra.com/search?q={query}"
+const PRICES = {
+  "milk": [
+    { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
+    { marketplace: "Zepto",     price: 55, url_template: "https://www.zepto.com/search?query={query}" },
+    { marketplace: "Blinkit",   price: 60, url_template: "https://blinkit.com/s/?q={query}" }
+  ],
+  "quick sugar 1kg": [
+    { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
+    { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?query={query}" },
+    { marketplace: "Blinkit",   price: 110, url_template: "https://blinkit.com/s/?q={query}" }
+  ]
 };
-        "milk": [
-          { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
-          { marketplace: "Zepto", price: 55, url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
-          { marketplace: "Blinkit", price: 60, url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
-        ]
-      };
-
       const MARKETPLACE_FALLBACK = [
         { marketplace: "BigBasket", url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
         { marketplace: "Zepto", url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
