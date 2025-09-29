@@ -107,12 +107,15 @@
 
     try {
       // sample dataset
-      const PRICES = {
-        "quick sugar 1kg": [
-          { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
-          { marketplace: "Zepto", price: 100, url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
-          { marketplace: "Blinkit", price: 110, url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
-        ],
+      // Use these templates in your PRICES object
+const TEMPLATE_EXAMPLES = {
+  bigbasket:   "https://www.bigbasket.com/catalogsearch/result/?q={query}",
+  zepto:       "https://www.zepto.com/search?q={query}",            // sometimes zepto uses zepto.co / .in -> test and adjust
+  blinkit:     "https://www.blinkit.com/search?query={query}",
+  amazon_in:   "https://www.amazon.in/s?k={query}",
+  flipkart:    "https://www.flipkart.com/search?q={query}",
+  myntra:      "https://www.myntra.com/search?q={query}"
+};
         "milk": [
           { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
           { marketplace: "Zepto", price: 55, url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
@@ -134,13 +137,25 @@
         if (/(kg|l|litre|liter|ltr)/i.test(it)) return it;
         const ut = unit === "l" ? (qty + " l") : (qty + " kg");
         return it + " " + ut;
-      }
-      function buildSearchLink(template, itemQuery, qty, unit){
-        const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
-        return template.replace("{query}", q);
-      }
+     // universal search builder — tries a few common patterns per marketplace
+function buildSearchLinkForMarketplace(marketplaceKey, itemQuery, qty, unit) {
+  const qText = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
+
+  // canonical templates (edit if you find a marketplace uses a different pattern)
+  const templates = {
+    "BigBasket":   "https://www.bigbasket.com/catalogsearch/result/?q={query}",
+    "Zepto":       "https://www.zepto.com/search?q={query}",
+    "Blinkit":     "https://www.blinkit.com/search?query={query}",
+    "Amazon.in":   "https://www.amazon.in/s?k={query}",
+    "Flipkart":    "https://www.flipkart.com/search?q={query}"
+  };
+
+  const t = templates[marketplaceKey] || templates["BigBasket"];
+  return t.replace("{query}", qText);
+}
+
       function openMarketplace(entry, itemQuery, qty, unit){
-        const webUrl = buildSearchLink(entry.url_template, itemQuery, qty, unit);
+        const webUrl = buildSearchLinkForMarketplace(entry.marketplace, itemQuery, qty, unit);
         const appScheme = entry.app_scheme ? buildSearchLink(entry.app_scheme, itemQuery, qty, unit) : null;
         const intentHost = entry.intent_host || null;
         console.log("PricePilot: openMarketplace", entry.marketplace, {webUrl, appScheme, intentHost});
