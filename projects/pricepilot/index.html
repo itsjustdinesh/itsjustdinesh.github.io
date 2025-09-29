@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PricePilot — Quick Price Compare</title>
+  <meta name="description" content="PricePilot — quickly compare item prices across Zepto, Blinkit & BigBasket (frontend-only demo)" />
+  <style>
+    :root{ --bg:#f8fafc; --card:#fff; --muted:#667085; --accent:#0ea5a4; --shadow: 0 6px 18px rgba(15,23,42,0.08); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    body{ margin:0; background:var(--bg); color:#0f172a; padding:28px; -webkit-font-smoothing:antialiased; }
+    .wrap{ max-width:980px; margin:0 auto; }
+    header{ display:flex; gap:16px; align-items:center; margin-bottom:18px; }
+    .logo{ width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,#06b6d4,#0891b2); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:var(--shadow); }
+    h1{ margin:0; font-size:22px; }
+    p.lead{ margin:4px 0 0; color:var(--muted); font-size:14px; }
+    .card{ background:var(--card); padding:18px; border-radius:12px; box-shadow:var(--shadow); margin-bottom:18px; }
+    form.grid{ display:grid; grid-template-columns: 1fr 160px; gap:12px; align-items:end; }
+    .input, .small{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6eef3; background:#fff; font-size:14px; }
+    .small{ padding:8px 10px; }
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .controls{ display:flex; gap:10px; align-items:center; }
+    button.primary{ background:var(--accent); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .result-list{ margin-top:16px; display:grid; gap:10px; }
+    .row{ display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; border:1px solid #eef3f7; background:linear-gradient(180deg,#fff,#fbfdff); }
+    .price{ font-size:18px; font-weight:700; color:#05264b; }
+    .meta{ font-size:13px; color:var(--muted); }
+    .market-links{ display:flex; gap:8px; align-items:center; }
+    .market { padding:8px 10px; border-radius:8px; background:#f1f8f9; border:1px solid #e6f3f3; cursor:pointer; font-size:13px; text-decoration:none; color:#064e49; }
+    .hint{ font-size:13px; color:var(--muted); margin-top:8px; }
+    .small-muted{ font-size:12px; color:#9aa4b2; margin-top:6px; }
+    @media(max-width:680px){ form.grid{ grid-template-columns: 1fr; } .controls{ flex-direction:column; align-items:stretch; } }
+    pre{ background:#071124; color:#cde; padding:12px; border-radius:8px; overflow:auto; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">PP</div>
+      <div>
+        <h1>PricePilot</h1>
+        <p class="lead">Find the best price fast — compare across Zepto, Blinkit & BigBasket (demo)</p>
+      </div>
+    </header>
+
+    <section class="card" aria-labelledby="searchTitle">
+      <h2 id="searchTitle" style="margin:0 0 10px 0">Search</h2>
+      <form id="searchForm" class="grid" onsubmit="return false;">
+        <div>
+          <label for="item">Item to search</label>
+          <input id="item" class="input" placeholder="e.g. Quick sugar 1kg" required />
+        </div>
+
+        <div>
+          <label for="qty">Quantity</label>
+          <div style="display:flex; gap:8px;">
+            <input id="qty" type="number" min="1" value="1" class="input" style="flex:1" />
+            <div class="small" style="display:flex;align-items:center;justify-content:center;">kg</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="place">Place (city)</label>
+          <input id="place" class="input" placeholder="e.g. Hyderabad" />
+        </div>
+
+        <div>
+          <label for="pin">Pincode</label>
+          <input id="pin" class="input" placeholder="e.g. 500081" />
+        </div>
+
+        <div style="grid-column: 1 / -1; display:flex; gap:8px; margin-top:6px;">
+          <div style="flex:1"><button id="searchBtn" class="primary" type="button">Search best price</button></div>
+          <div style="display:flex;gap:8px;">
+            <button id="showDataBtn" class="small" type="button">Show data (editable)</button>
+            <button id="resetBtn" class="small" type="button">Reset</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="results" class="result-list" aria-live="polite"></div>
+      <div class="hint">Click a marketplace to open its site search (new tab). Edit the local dataset using <strong>Show data</strong>.</div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin:0 0 10px 0">How it works — what we do & why</h3>
+      <ol style="margin:0 0 10px 0; color:var(--muted)">
+        <li><strong>What we do:</strong> Accept item + qty + location and show the lowest → medium → highest prices from supported quick-commerce apps (no backend).</li>
+        <li><strong>Why:</strong> Saves time — user no longer opens multiple delivery apps to check prices.</li>
+        <li><strong>Result:</strong> Price list sorted ascending. Clicking a marketplace opens the marketplace search with the item query filled.</li>
+      </ol>
+      <div class="small-muted">Tip: edit the PRICES dataset in the "Show data" box to reflect up-to-date prices you want to present on your portfolio.</div>
+    </section>
+
+    <footer style="text-align:center; color:var(--muted); margin-top:18px;">
+      Built with simple Web Tech • Add this file under <code>projects/pricepilot/index.html</code> in your Pages repo
+    </footer>
+  </div>
+
+  <script>
+    const PRICES = {
+      "quick sugar 1kg": [
+        { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}" },
+        { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?q={query}" },
+        { marketplace: "Blinkit",   price: 110, url_template: "https://www.blinkit.com/search?query={query}" }
+      ],
+      "gnc mass gainer 3kg": [
+        { marketplace: "Amazon.in", price: 3499, url_template: "https://www.amazon.in/s?k={query}" },
+        { marketplace: "Flipkart",  price: 3599, url_template: "https://www.flipkart.com/search?q={query}" }
+      ]
+    };
+
+    const $ = id => document.getElementById(id);
+    const normalize = s => (s||"").trim().toLowerCase();
+
+    function buildSearchUrl(template, itemQuery, qty) {
+      const q = encodeURIComponent(itemQuery + (qty ? (" " + qty + "kg") : ""));
+      return template.replace("{query}", q);
+    }
+
+    function findPricesFor(itemName) {
+      const keyExact = normalize(itemName);
+      if (PRICES[keyExact]) return PRICES[keyExact].slice();
+      for (const key in PRICES) if (key.includes(keyExact) || keyExact.includes(key)) return PRICES[key].slice();
+      // fuzzy match by words
+      const words = keyExact.split(/\s+/).filter(Boolean);
+      const matches = [];
+      for (const key in PRICES) {
+        let score = 0; for (const w of words) if (key.includes(w)) score++;
+        if (score) matches.push({key,score});
+      }
+      if (matches.length) { matches.sort((a,b)=>b.score-a.score); return PRICES[matches[0].key].slice(); }
+      return null;
+    }
+
+    function renderResults(list, itemQuery, qty) {
+      const container = $("results");
+      container.innerHTML = "";
+      if (!list || list.length===0) {
+        container.innerHTML = '<div class="row"><div class="meta">No prices found for this item in local dataset. Click <strong>Show data</strong> to add prices.</div></div>';
+        return;
+      }
+      list.sort((a,b)=>a.price - b.price);
+      for (const entry of list) {
+        const row = document.createElement("div"); row.className="row";
+        const left = document.createElement("div");
+        left.innerHTML = `<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
+        const right = document.createElement("div"); right.className="market-links";
+        const url = buildSearchUrl(entry.url_template, itemQuery, qty);
+        const a = document.createElement("a");
+        a.className = "market"; a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        a.innerText = "Open";
+        right.appendChild(a);
+        row.appendChild(left); row.appendChild(right); container.appendChild(row);
+      }
+    }
+
+    $("searchBtn").addEventListener("click", ()=>{
+      const item = normalize($("item").value);
+      const qty = $("qty").value;
+      if (!item) { alert("Please enter an item to search"); return; }
+      const found = findPricesFor(item);
+      renderResults(found, $("item").value.trim(), qty);
+    });
+
+    $("resetBtn").addEventListener("click", ()=>{
+      $("item").value=""; $("qty").value=1; $("place").value=""; $("pin").value=""; $("results").innerHTML="";
+    });
+
+    $("showDataBtn").addEventListener("click", ()=>{
+      const current = JSON.stringify(PRICES, null, 2);
+      const edited = prompt("Edit PRICES dataset JSON (replace whole object). Example key: 'quick sugar 1kg'", current);
+      if (!edited) return;
+      try {
+        const obj = JSON.parse(edited);
+        for (const k in obj) if (!Array.isArray(obj[k])) throw new Error("Each key must map to an array");
+        for (const key in PRICES) delete PRICES[key];
+        for (const key in obj) PRICES[key] = obj[key];
+        alert("PRICES updated. Now perform a search to see results.");
+      } catch (err) { alert("Invalid JSON: " + err.message); }
+    });
+
+    window.addEventListener("load", ()=>{ if (!$("item").value) $("item").value = "Quick sugar 1kg"; });
+  </script>
+</body>
+</html>
