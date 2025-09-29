@@ -97,89 +97,208 @@
   </div>
 
   <script>
-    const PRICES = {
-      "quick sugar 1kg": [
-        { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}" },
-        { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?q={query}" },
-        { marketplace: "Blinkit",   price: 110, url_template: "https://www.blinkit.com/search?query={query}" }
-      ],
-      "gnc mass gainer 3kg": [
-        { marketplace: "Amazon.in", price: 3499, url_template: "https://www.amazon.in/s?k={query}" },
-        { marketplace: "Flipkart",  price: 3599, url_template: "https://www.flipkart.com/search?q={query}" }
-      ]
-    };
+/*
+ Improved PricePilot frontend script
+ - Unit toggle (kg / litre)
+ - Better matching
+ - Attempt to open app deep-links / Android intent then fallback to marketplace web search
+ - Frontend-only (no backend). Deep-link behavior depends on app support; fallback always opens web search.
+*/
 
-    const $ = id => document.getElementById(id);
-    const normalize = s => (s||"").trim().toLowerCase();
+const PRICES = {
+  "quick sugar 1kg": [
+    { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
+    { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
+    { marketplace: "Blinkit",   price: 110, url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
+  ],
+  "milk 1l": [
+    { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
+    { marketplace: "Zepto",     price: 55, url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
+    { marketplace: "Blinkit",   price: 60, url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
+  ]
+};
 
-    function buildSearchUrl(template, itemQuery, qty) {
-      const q = encodeURIComponent(itemQuery + (qty ? (" " + qty + "kg") : ""));
-      return template.replace("{query}", q);
+// fallback web-only list (if PRICES has no entry)
+const MARKETPLACE_FALLBACK = [
+  { marketplace: "BigBasket", url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
+  { marketplace: "Zepto",     url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
+  { marketplace: "Blinkit",   url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
+];
+
+const $ = id => document.getElementById(id);
+const normalize = s => (s||"").trim().toLowerCase();
+
+// Build query text including qty + unit (kg or l)
+function buildQueryText(item, qty, unit) {
+  item = item.trim();
+  if (!qty) return item;
+  // e.g., "Milk 1 l" or "Sugar 1 kg"
+  const unitText = unit === "l" ? (qty + " l") : (qty + " kg");
+  // if user already typed unit in item, avoid duplication
+  if (item.toLowerCase().includes("kg") || item.toLowerCase().includes("l") || item.toLowerCase().includes("litre") || item.toLowerCase().includes("litre")) {
+    return item;
+  }
+  return item + " " + unitText;
+}
+
+// Build URLs from templates
+function buildSearchLink(template, itemQuery, qty, unit) {
+  const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
+  return template.replace("{query}", q);
+}
+
+// Try to open app deep link, then fallback to web URL.
+// We attempt in this order:
+// 1) If browser supports intent syntax (Android Chrome), open intent:... which can fall back to web URL.
+// 2) Try direct app scheme (myapp://search?...). If it fails (no app), after timeout we open web URL.
+// 3) If all else, open web URL immediately.
+function openMarketplace(entry, itemQuery, qty, unit) {
+  const webUrl = buildSearchLink(entry.url_template, itemQuery, qty, unit);
+  const appScheme = entry.app_scheme ? buildSearchLink(entry.app_scheme, itemQuery, qty, unit) : null;
+  const intentHost = entry.intent_host || null;
+
+  // If the browser supports intent: and we have an intent_host, build an Android intent URL.
+  // Format: intent://search?q=...#Intent;scheme=https;package=<package_name>;end
+  // NOTE: behavior varies by browser and platform.
+  if (intentHost && navigator.userAgent.toLowerCase().includes("android")) {
+    try {
+      const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
+      // try an intent that points to the website fallback using the host, package
+      // Many apps register web URLs as app links; this intent sometimes opens the app directly if installed.
+      const intentUrl = `intent://search?q=${q}#Intent;scheme=https;package=${intentHost};S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+      window.location.href = intentUrl;
+      return;
+    } catch (e) {
+      // fall through to appScheme/web fallback
     }
+  }
 
-    function findPricesFor(itemName) {
-      const keyExact = normalize(itemName);
-      if (PRICES[keyExact]) return PRICES[keyExact].slice();
-      for (const key in PRICES) if (key.includes(keyExact) || keyExact.includes(key)) return PRICES[key].slice();
-      // fuzzy match by words
-      const words = keyExact.split(/\s+/).filter(Boolean);
-      const matches = [];
-      for (const key in PRICES) {
-        let score = 0; for (const w of words) if (key.includes(w)) score++;
-        if (score) matches.push({key,score});
-      }
-      if (matches.length) { matches.sort((a,b)=>b.score-a.score); return PRICES[matches[0].key].slice(); }
-      return null;
+  // If we have an app scheme (custom URI), try to open it, with a timer fallback to webUrl.
+  if (appScheme) {
+    const now = Date.now();
+    // create hidden iframe as one technique for iOS/older browsers
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = appScheme;
+    document.body.appendChild(iframe);
+
+    // fallback: after 1.1s, if still on page, open web URL
+    setTimeout(() => {
+      const elapsed = Date.now() - now;
+      // remove iframe
+      try { iframe.remove(); } catch(e){}
+      // open web fallback
+      window.open(webUrl, "_blank", "noopener");
+    }, 1100);
+    return;
+  }
+
+  // default: open web URL in new tab
+  window.open(webUrl, "_blank", "noopener");
+}
+
+// ---------- matching logic (same improved approach as before) ----------
+function findPricesFor(itemName) {
+  const keyExact = normalize(itemName);
+  if (!keyExact) return null;
+  if (PRICES[keyExact]) return PRICES[keyExact].slice();
+  for (const key in PRICES) {
+    if (key.includes(keyExact) || keyExact.includes(key)) return PRICES[key].slice();
+  }
+  const words = keyExact.split(/\s+/).filter(Boolean);
+  const scored = [];
+  for (const key in PRICES) {
+    let score = 0;
+    for (const w of words) {
+      if (key.includes(w)) score++;
+      const wSing = w.replace(/s$/, "");
+      if (wSing !== w && key.includes(wSing)) score++;
     }
+    if (score > 0) scored.push({key, score});
+  }
+  if (scored.length) { scored.sort((a,b)=>b.score - a.score); return PRICES[scored[0].key].slice(); }
+  for (const key in PRICES) {
+    if (key.split(/\W+/).some(tok => tok && keyExact.includes(tok))) return PRICES[key].slice();
+  }
+  return null;
+}
 
-    function renderResults(list, itemQuery, qty) {
-      const container = $("results");
-      container.innerHTML = "";
-      if (!list || list.length===0) {
-        container.innerHTML = '<div class="row"><div class="meta">No prices found for this item in local dataset. Click <strong>Show data</strong> to add prices.</div></div>';
-        return;
-      }
-      list.sort((a,b)=>a.price - b.price);
-      for (const entry of list) {
-        const row = document.createElement("div"); row.className="row";
-        const left = document.createElement("div");
-        left.innerHTML = `<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
-        const right = document.createElement("div"); right.className="market-links";
-        const url = buildSearchUrl(entry.url_template, itemQuery, qty);
-        const a = document.createElement("a");
-        a.className = "market"; a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
-        a.innerText = "Open";
-        right.appendChild(a);
-        row.appendChild(left); row.appendChild(right); container.appendChild(row);
-      }
-    }
-
-    $("searchBtn").addEventListener("click", ()=>{
-      const item = normalize($("item").value);
-      const qty = $("qty").value;
-      if (!item) { alert("Please enter an item to search"); return; }
-      const found = findPricesFor(item);
-      renderResults(found, $("item").value.trim(), qty);
+// UI rendering
+function renderResults(list, itemQuery, qty, unit) {
+  const container = $("results");
+  container.innerHTML = "";
+  if (!list || list.length === 0) {
+    // show fallback marketplace search links
+    MARKETPLACE_FALLBACK.forEach(mkt => {
+      const row = document.createElement("div");
+      row.className = "row";
+      const left = document.createElement("div");
+      left.innerHTML = `<div class="price">—</div><div class="meta">${mkt.marketplace}</div>`;
+      const right = document.createElement("div");
+      right.className = "market-links";
+      const a = document.createElement("button");
+      a.className = "market";
+      a.innerText = "Open";
+      a.onclick = () => openMarketplace(mkt, itemQuery, qty, unit);
+      right.appendChild(a);
+      row.appendChild(left); row.appendChild(right); container.appendChild(row);
     });
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.style.marginTop = "8px";
+    hint.innerHTML = `No local price data for <strong>${escapeHtml(itemQuery)}</strong>. Use the buttons above to search marketplaces. To show actual price rows, use <strong>Show data</strong> to add prices to the dataset.`;
+    container.appendChild(hint);
+    return;
+  }
+  list.sort((a,b) => (a.price || 0) - (b.price || 0));
+  for (const entry of list) {
+    const row = document.createElement("div");
+    row.className = "row";
+    const left = document.createElement("div");
+    left.innerHTML = `<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
+    const right = document.createElement("div");
+    right.className = "market-links";
+    const btn = document.createElement("button");
+    btn.className = "market";
+    btn.innerText = "Open";
+    btn.onclick = () => openMarketplace(entry, itemQuery, qty, unit);
+    right.appendChild(btn);
+    row.appendChild(left); row.appendChild(right); container.appendChild(row);
+  }
+}
 
-    $("resetBtn").addEventListener("click", ()=>{
-      $("item").value=""; $("qty").value=1; $("place").value=""; $("pin").value=""; $("results").innerHTML="";
-    });
+// small helpers
+function escapeHtml(s) {
+  return (s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-    $("showDataBtn").addEventListener("click", ()=>{
-      const current = JSON.stringify(PRICES, null, 2);
-      const edited = prompt("Edit PRICES dataset JSON (replace whole object). Example key: 'quick sugar 1kg'", current);
-      if (!edited) return;
-      try {
-        const obj = JSON.parse(edited);
-        for (const k in obj) if (!Array.isArray(obj[k])) throw new Error("Each key must map to an array");
-        for (const key in PRICES) delete PRICES[key];
-        for (const key in obj) PRICES[key] = obj[key];
-        alert("PRICES updated. Now perform a search to see results.");
-      } catch (err) { alert("Invalid JSON: " + err.message); }
-    });
+// events
+$("searchBtn").addEventListener("click", () => {
+  const rawItem = ($("item").value || "").trim();
+  const qty = $("qty").value || 1;
+  const unit = $("unitSelect") ? $("unitSelect").value : "kg";
+  if (!rawItem) { alert("Please enter an item to search"); return; }
+  const found = findPricesFor(rawItem);
+  renderResults(found, rawItem, qty, unit);
+});
 
-    window.addEventListener("load", ()=>{ if (!$("item").value) $("item").value = "Quick sugar 1kg"; });
-  </script>
-</body>
-</html>
+$("resetBtn").addEventListener("click", ()=>{
+  $("item").value = ""; $("qty").value = 1; $("place").value = ""; $("pin").value = ""; $("results").innerHTML = "";
+});
+
+// Show data editor (prompt-based)
+$("showDataBtn").addEventListener("click", ()=>{
+  const current = JSON.stringify(PRICES, null, 2);
+  const edited = prompt("Edit PRICES dataset JSON (replace whole object). Example key: 'quick sugar 1kg'", current);
+  if (!edited) return;
+  try {
+    const obj = JSON.parse(edited);
+    for (const k in obj) if (!Array.isArray(obj[k])) throw new Error("Each key must map to an array");
+    for (const key in PRICES) delete PRICES[key];
+    for (const key in obj) PRICES[key] = obj[key];
+    alert("PRICES updated. Now perform a search to see results.");
+  } catch (err) { alert("Invalid JSON: " + err.message); }
+});
+
+window.addEventListener("load", ()=>{ if (!$("item").value) $("item").value = "Quick sugar 1kg"; });
+</script>
