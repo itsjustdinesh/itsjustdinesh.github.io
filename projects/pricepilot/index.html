@@ -3,32 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PricePilot — Quick Price Compare (Debug)</title>
-  <meta name="description" content="PricePilot — debug build with logs" />
+  <title>PricePilot — Quick Price Compare</title>
   <style>
-    :root{ --bg:#f8fafc; --card:#fff; --muted:#667085; --accent:#0ea5a4; --shadow: 0 6px 18px rgba(15,23,42,0.08); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    body{ margin:0; background:var(--bg); color:#0f172a; padding:28px; -webkit-font-smoothing:antialiased; }
-    .wrap{ max-width:980px; margin:0 auto; }
-    header{ display:flex; gap:16px; align-items:center; margin-bottom:12px; }
-    .logo{ width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,#06b6d4,#0891b2); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; box-shadow:var(--shadow); }
-    h1{ margin:0; font-size:22px; }
-    p.lead{ margin:4px 0 0; color:var(--muted); font-size:14px; }
-    .card{ background:var(--card); padding:18px; border-radius:12px; box-shadow:var(--shadow); margin-bottom:18px; }
-    form.grid{ display:grid; grid-template-columns: 1fr 160px; gap:12px; align-items:end; }
-    .input, .small{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6eef3; background:#fff; font-size:14px; }
-    .small{ padding:8px 10px; }
-    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
-    button.primary{ background:var(--accent); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600; }
-    .result-list{ margin-top:16px; display:grid; gap:10px; }
-    .row{ display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; border:1px solid #eef3f7; background:linear-gradient(180deg,#fff,#fbfdff); }
-    .price{ font-size:18px; font-weight:700; color:#05264b; }
-    .meta{ font-size:13px; color:var(--muted); }
-    .market-links{ display:flex; gap:8px; align-items:center; }
-    .market { padding:8px 10px; border-radius:8px; background:#f1f8f9; border:1px solid #e6f3f3; cursor:pointer; font-size:13px; text-decoration:none; color:#064e49; }
-    .hint{ font-size:13px; color:var(--muted); margin-top:8px; }
-    .small-muted{ font-size:12px; color:#9aa4b2; margin-top:6px; }
-    .status{ padding:10px 12px; border-radius:8px; background:#05264b; color:#fff; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
-    .status .ok{ color:#8ff; font-weight:700; }
+    :root{
+      --bg:#f8fafc; --card:#fff; --muted:#667085; --accent:#0ea5a4;
+      --shadow:0 6px 18px rgba(15,23,42,0.08);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    }
+    body{margin:0;background:var(--bg);color:#0f172a;padding:28px;-webkit-font-smoothing:antialiased;}
+    .wrap{max-width:980px;margin:0 auto;}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:12px;}
+    .logo{width:64px;height:64px;border-radius:12px;
+      background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:20px;box-shadow:var(--shadow);}
+    h1{margin:0;font-size:22px;}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:14px;}
+    .card{background:var(--card);padding:18px;border-radius:12px;
+      box-shadow:var(--shadow);margin-bottom:18px;}
+    form.grid{display:grid;grid-template-columns:1fr 160px;gap:12px;align-items:end;}
+    .input,.small{width:100%;padding:10px 12px;border-radius:8px;
+      border:1px solid #e6eef3;background:#fff;font-size:14px;}
+    .small{padding:8px 10px;}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+    button.primary{background:var(--accent);color:#fff;border:0;padding:10px 14px;
+      border-radius:8px;cursor:pointer;font-weight:600;}
+    .result-list{margin-top:16px;display:grid;gap:10px;}
+    .row{display:flex;justify-content:space-between;align-items:center;
+      padding:12px;border-radius:10px;border:1px solid #eef3f7;
+      background:linear-gradient(180deg,#fff,#fbfdff);}
+    .price{font-size:18px;font-weight:700;color:#05264b;}
+    .meta{font-size:13px;color:var(--muted);}
+    .market-links{display:flex;gap:8px;align-items:center;}
+    .market{padding:8px 10px;border-radius:8px;background:#f1f8f9;
+      border:1px solid #e6f3f3;cursor:pointer;font-size:13px;text-decoration:none;color:#064e49;}
+    .hint{font-size:13px;color:var(--muted);margin-top:8px;}
+    .status{padding:10px 12px;border-radius:8px;background:#05264b;color:#fff;
+      margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+    .status .ok{color:#8ff;font-weight:700;}
   </style>
 </head>
 <body>
@@ -43,12 +55,12 @@
 
     <div id="statusBar" class="status">PricePilot status: <span id="statusText" class="ok">initializing…</span></div>
 
-    <section class="card" aria-labelledby="searchTitle">
-      <h2 id="searchTitle" style="margin:0 0 10px 0">Search</h2>
-      <form id="searchForm" class="grid" onsubmit="return false;">
+    <section class="card">
+      <h2 style="margin:0 0 10px 0">Search</h2>
+      <form class="grid" onsubmit="return false;">
         <div>
           <label for="item">Item to search</label>
-          <input id="item" class="input" placeholder="e.g. Quick sugar 1kg" required />
+          <input id="item" class="input" placeholder="e.g. Milk" required />
         </div>
 
         <div>
@@ -72,222 +84,84 @@
           <input id="pin" class="input" placeholder="e.g. 500081" />
         </div>
 
-        <div style="grid-column: 1 / -1; display:flex; gap:8px; margin-top:6px;">
+        <div style="grid-column:1/-1; display:flex; gap:8px; margin-top:6px;">
           <div style="flex:1"><button id="searchBtn" class="primary" type="button">Search best price</button></div>
           <div style="display:flex;gap:8px;">
-            <button id="showDataBtn" class="small" type="button">Show data (editable)</button>
             <button id="resetBtn" class="small" type="button">Reset</button>
           </div>
         </div>
       </form>
 
-      <div id="results" class="result-list" aria-live="polite"></div>
-      <div class="hint">Click a marketplace to open its site or try the app (if installed). Use Show data to add sample price rows.</div>
-    </section>
-
-    <section class="card">
-      <h3 style="margin:0 0 10px 0">How it works — what we do & why</h3>
-      <ol style="margin:0 0 10px 0; color:var(--muted)">
-        <li><strong>What we do:</strong> Accept item + qty + location and show the lowest → medium → highest prices from supported quick-commerce apps (no backend).</li>
-        <li><strong>Why:</strong> Saves time — user no longer opens multiple delivery apps to check prices.</li>
-        <li><strong>Result:</strong> Price list sorted ascending. Clicking marketplace attempts app then falls back to website.</li>
-      </ol>
+      <div id="results" class="result-list"></div>
+      <div class="hint">Click a marketplace to open its site with the search applied.</div>
     </section>
   </div>
 
   <script>
-  // DEBUG build — logs visible and console messages
-  (function(){
-    console.log("PricePilot: script start");
     const statusText = document.getElementById("statusText");
-    function setStatus(s, ok=true){
-      statusText.textContent = s;
-      statusText.style.color = ok ? "#8ff" : "#ffb3b3";
+    function setStatus(msg, ok=true){ statusText.textContent = msg; statusText.style.color = ok?"#8ff":"#ffb3b3"; }
+
+    const PRICES = {
+      "milk": [
+        { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
+        { marketplace: "Zepto",     price: 55, url_template: "https://www.zepto.com/search?query={query}" },
+        { marketplace: "Blinkit",   price: 60, url_template: "https://blinkit.com/s/?q={query}" }
+      ],
+      "quick sugar 1kg": [
+        { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
+        { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?query={query}" },
+        { marketplace: "Blinkit",   price: 110, url_template: "https://blinkit.com/s/?q={query}" }
+      ]
+    };
+
+    function buildQueryText(item, qty, unit){
+      const it = item.trim();
+      if (!qty) return it;
+      if (/(kg|l|litre|liter|ltr)/i.test(it)) return it;
+      const ut = unit==="l" ? (qty+" l") : (qty+" kg");
+      return it+" "+ut;
     }
-
-    try {
-      // sample dataset
-      // Use these templates in your PRICES object
-const PRICES = {
-  "milk": [
-    {
-      marketplace: "BigBasket",
-      price: 50,
-      url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as"
-    },
-    {
-      marketplace: "Zepto",
-      price: 55,
-      url_template: "https://www.zepto.com/search?query={query}"
-    },
-    {
-      marketplace: "Blinkit",
-      price: 60,
-      url_template: "https://blinkit.com/s/?q={query}"
+    function buildSearchLink(template, itemQuery, qty, unit){
+      const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
+      return template.replace("{query}", q);
     }
-  ],
-  "quick sugar 1kg": [
-    {
-      marketplace: "BigBasket",
-      price: 80,
-      url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as"
-    },
-    {
-      marketplace: "Zepto",
-      price: 100,
-      url_template: "https://www.zepto.com/search?query={query}"
-    },
-    {
-      marketplace: "Blinkit",
-      price: 110,
-      url_template: "https://blinkit.com/s/?q={query}"
+    function findPricesFor(itemName){
+      const keyExact = itemName.trim().toLowerCase();
+      if (PRICES[keyExact]) return PRICES[keyExact];
+      for (const k in PRICES){ if (k.includes(keyExact) || keyExact.includes(k)) return PRICES[k]; }
+      return null;
     }
-  ]
-};
-
-      const MARKETPLACE_FALLBACK = [
-        { marketplace: "BigBasket", url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
-        { marketplace: "Zepto", url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
-        { marketplace: "Blinkit", url_template: "https://www.blinkit.com/search?query={query}", app_scheme: "blinkit://search?query={query}", intent_host: "blinkit.app" }
-      ];
-
-      const $ = id => document.getElementById(id);
-      const normalize = s => (s||"").trim().toLowerCase();
-      function buildQueryText(item, qty, unit){
-        const it = item.trim();
-        if (!qty) return it;
-        if (/(kg|l|litre|liter|ltr)/i.test(it)) return it;
-        const ut = unit === "l" ? (qty + " l") : (qty + " kg");
-        return it + " " + ut;
-     // universal search builder — tries a few common patterns per marketplace
-function buildSearchLinkForMarketplace(marketplaceKey, itemQuery, qty, unit) {
-  const qText = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
-
-  // canonical templates (edit if you find a marketplace uses a different pattern)
-  const templates = {
-    "BigBasket":   "https://www.bigbasket.com/catalogsearch/result/?q={query}",
-    "Zepto":       "https://www.zepto.com/search?q={query}",
-    "Blinkit":     "https://www.blinkit.com/search?query={query}",
-    "Amazon.in":   "https://www.amazon.in/s?k={query}",
-    "Flipkart":    "https://www.flipkart.com/search?q={query}"
-  };
-
-  const t = templates[marketplaceKey] || templates["BigBasket"];
-  return t.replace("{query}", qText);
-}
-
-      function openMarketplace(entry, itemQuery, qty, unit){
-        const webUrl = buildSearchLinkForMarketplace(entry.marketplace, itemQuery, qty, unit);
-        const appScheme = entry.app_scheme ? buildSearchLink(entry.app_scheme, itemQuery, qty, unit) : null;
-        const intentHost = entry.intent_host || null;
-        console.log("PricePilot: openMarketplace", entry.marketplace, {webUrl, appScheme, intentHost});
-        if (intentHost && navigator.userAgent.toLowerCase().includes("android")){
-          try {
-            const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
-            const intentUrl = `intent://search?q=${q}#Intent;scheme=https;package=${intentHost};S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
-            console.log("PricePilot: trying intent URL", intentUrl);
-            window.location.href = intentUrl;
-            return;
-          } catch(e){}
-        }
-        if (appScheme){
-          const now = Date.now();
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = appScheme;
-          document.body.appendChild(iframe);
-          setTimeout(()=>{ try{ iframe.remove(); }catch(e){}; window.open(webUrl, "_blank", "noopener"); }, 1100);
-          return;
-        }
-        window.open(webUrl, "_blank", "noopener");
+    function renderResults(list,itemQuery,qty,unit){
+      const c=document.getElementById("results"); c.innerHTML="";
+      if(!list){ c.innerHTML="<div class='hint'>No prices found. Try editing dataset.</div>"; return;}
+      list.sort((a,b)=>a.price-b.price);
+      for(const entry of list){
+        const row=document.createElement("div"); row.className="row";
+        const left=document.createElement("div"); left.innerHTML=`<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
+        const right=document.createElement("div"); right.className="market-links";
+        const btn=document.createElement("a"); btn.className="market"; btn.innerText="Open";
+        btn.href=buildSearchLink(entry.url_template,itemQuery,qty,unit); btn.target="_blank";
+        right.appendChild(btn); row.appendChild(left); row.appendChild(right); c.appendChild(row);
       }
-
-      function findPricesFor(itemName){
-        const keyExact = normalize(itemName);
-        if (!keyExact) return null;
-        if (PRICES[keyExact]) return PRICES[keyExact].slice();
-        for (const key in PRICES) if (key.includes(keyExact) || keyExact.includes(key)) return PRICES[key].slice();
-        const words = keyExact.split(/\s+/).filter(Boolean);
-        const scored = [];
-        for (const key in PRICES){
-          let score = 0;
-          for (const w of words){ if (key.includes(w)) score++; const wSing = w.replace(/s$/,""); if (wSing !== w && key.includes(wSing)) score++; }
-          if (score>0) scored.push({key, score});
-        }
-        if (scored.length){ scored.sort((a,b)=>b.score-a.score); return PRICES[scored[0].key].slice(); }
-        for (const key in PRICES) if (key.split(/\W+/).some(tok=>tok && keyExact.includes(tok))) return PRICES[key].slice();
-        return null;
-      }
-
-      function renderResults(list, itemQuery, qty, unit){
-        const container = $("results");
-        container.innerHTML = "";
-        if (!list || list.length===0){
-          MARKETPLACE_FALLBACK.forEach(mkt=>{
-            const row = document.createElement("div"); row.className="row";
-            const left = document.createElement("div"); left.innerHTML = `<div class="price">—</div><div class="meta">${mkt.marketplace}</div>`;
-            const right = document.createElement("div"); right.className="market-links";
-            const a = document.createElement("button"); a.className="market"; a.innerText="Open";
-            a.onclick = ()=> openMarketplace(mkt, itemQuery, qty, unit);
-            right.appendChild(a); row.appendChild(left); row.appendChild(right); container.appendChild(row);
-          });
-          const hint = document.createElement("div"); hint.className="hint"; hint.style.marginTop="8px";
-          hint.innerHTML = `No local price data for <strong>${escapeHtml(itemQuery)}</strong>. Use the buttons above to search marketplaces or click Show data to add prices.`;
-          container.appendChild(hint);
-          return;
-        }
-        list.sort((a,b)=> (a.price||0) - (b.price||0));
-        for (const entry of list){
-          const row = document.createElement("div"); row.className="row";
-          const left = document.createElement("div"); left.innerHTML=`<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
-          const right = document.createElement("div"); right.className="market-links";
-          const btn = document.createElement("button"); btn.className="market"; btn.innerText="Open";
-          btn.onclick = ()=> openMarketplace(entry, itemQuery, qty, unit);
-          right.appendChild(btn); row.appendChild(left); row.appendChild(right); container.appendChild(row);
-        }
-      }
-
-      function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-      // wire events
-      console.log("PricePilot: PRICES keys:", Object.keys(PRICES));
-      setStatus("loaded — dataset keys: " + Object.keys(PRICES).join(", "), true);
-
-      $("searchBtn").addEventListener("click", ()=> {
-        const rawItem = ($("item").value || "").trim();
-        const qty = $("qty").value || 1;
-        const unit = $("unitSelect").value || "kg";
-        console.log("PricePilot: search click", {rawItem, qty, unit});
-        if (!rawItem){ alert("Please enter an item to search"); return; }
-        const found = findPricesFor(rawItem);
-        renderResults(found, rawItem, qty, unit);
-      });
-
-      $("resetBtn").addEventListener("click", ()=> { $("item").value=""; $("qty").value=1; $("place").value=""; $("pin").value=""; $("results").innerHTML=""; });
-
-      $("showDataBtn").addEventListener("click", ()=> {
-        const cur = JSON.stringify(PRICES, null, 2);
-        const edited = prompt("Edit PRICES dataset JSON (replace whole object). Example key: 'quick sugar 1kg'", cur);
-        if (!edited) return;
-        try {
-          const obj = JSON.parse(edited);
-          for (const k in obj) if (!Array.isArray(obj[k])) throw new Error("Each key must map to an array");
-          // replace PRICES object by reassigning keys (we cannot rebind const from prompt)
-          for (const k in PRICES) delete PRICES[k];
-          for (const k in obj) PRICES[k] = obj[k];
-          setStatus("dataset updated — keys: " + Object.keys(PRICES).join(", "), true);
-          alert("PRICES updated. Now perform a search.");
-        } catch(e){ alert("Invalid JSON: " + e.message); }
-      });
-
-      // initial demo value
-      window.addEventListener("load", ()=> { if (!$("item").value) $("item").value = "Milk"; });
-
-    } catch (err) {
-      console.error("PricePilot: initialization failed", err);
-      setStatus("error — see console", false);
     }
-  })();
+
+    document.getElementById("searchBtn").addEventListener("click",()=>{
+      const item=document.getElementById("item").value;
+      const qty=document.getElementById("qty").value||1;
+      const unit=document.getElementById("unitSelect").value||"kg";
+      if(!item){alert("Enter an item");return;}
+      const found=findPricesFor(item);
+      renderResults(found,item,qty,unit);
+    });
+    document.getElementById("resetBtn").addEventListener("click",()=>{
+      document.getElementById("item").value="";
+      document.getElementById("qty").value=1;
+      document.getElementById("place").value="";
+      document.getElementById("pin").value="";
+      document.getElementById("results").innerHTML="";
+    });
+
+    window.addEventListener("load",()=>{setStatus("loaded — dataset keys: "+Object.keys(PRICES).join(", "));});
   </script>
 </body>
 </html>
