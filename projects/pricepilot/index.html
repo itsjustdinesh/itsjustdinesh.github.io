@@ -3,104 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PricePilot — Quick Price Compare</title>
+  <title>PricePilot Demo (stable)</title>
   <style>
-    :root{
-      --bg:#f8fafc; --card:#fff; --muted:#667085; --accent:#0ea5a4;
-      --shadow:0 6px 18px rgba(15,23,42,0.08);
-      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    }
-    body{margin:0;background:var(--bg);color:#0f172a;padding:28px;-webkit-font-smoothing:antialiased;}
+    body{font-family:Arial, Helvetica, sans-serif; margin:24px; background:#f6fbfc; color:#05264b;}
     .wrap{max-width:980px;margin:0 auto;}
-    header{display:flex;gap:16px;align-items:center;margin-bottom:12px;}
-    .logo{width:64px;height:64px;border-radius:12px;
-      background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:700;font-size:20px;box-shadow:var(--shadow);}
-    h1{margin:0;font-size:22px;}
-    p.lead{margin:4px 0 0;color:var(--muted);font-size:14px;}
-    .card{background:var(--card);padding:18px;border-radius:12px;
-      box-shadow:var(--shadow);margin-bottom:18px;}
-    form.grid{display:grid;grid-template-columns:1fr 160px;gap:12px;align-items:end;}
-    .input,.small{width:100%;padding:10px 12px;border-radius:8px;
-      border:1px solid #e6eef3;background:#fff;font-size:14px;}
-    .small{padding:8px 10px;}
-    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
-    button.primary{background:var(--accent);color:#fff;border:0;padding:10px 14px;
-      border-radius:8px;cursor:pointer;font-weight:600;}
-    .result-list{margin-top:16px;display:grid;gap:10px;}
-    .row{display:flex;justify-content:space-between;align-items:center;
-      padding:12px;border-radius:10px;border:1px solid #eef3f7;
-      background:linear-gradient(180deg,#fff,#fbfdff);}
-    .price{font-size:18px;font-weight:700;color:#05264b;}
-    .meta{font-size:13px;color:var(--muted);}
-    .market-links{display:flex;gap:8px;align-items:center;}
-    .market{padding:8px 10px;border-radius:8px;background:#f1f8f9;
-      border:1px solid #e6f3f3;cursor:pointer;font-size:13px;text-decoration:none;color:#064e49;}
-    .hint{font-size:13px;color:var(--muted);margin-top:8px;}
-    .status{padding:10px 12px;border-radius:8px;background:#05264b;color:#fff;
-      margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
-    .status .ok{color:#8ff;font-weight:700;}
+    .status{padding:10px;border-radius:8px;background:#05264b;color:#fff;margin-bottom:14px;}
+    .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:18px;}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;border:1px solid #eef3f7;margin-top:10px;}
+    .price{font-weight:700}
+    .market{background:#06b6d4;color:#fff;padding:8px 10px;border-radius:8px;text-decoration:none;}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="logo">PP</div>
-      <div style="flex:1">
-        <h1>PricePilot</h1>
-        <p class="lead">Find the best price fast — compare across Zepto, Blinkit & BigBasket (demo)</p>
-      </div>
-    </header>
+    <h1>PricePilot</h1>
+    <div id="status" class="status">initializing…</div>
 
-    <div id="statusBar" class="status">PricePilot status: <span id="statusText" class="ok">initializing…</span></div>
+    <div class="card">
+      <label>Item: <input id="item" placeholder="e.g. Milk" /></label><br/><br/>
+      <label>Qty: <input id="qty" type="number" value="1" style="width:60px" /></label>
+      <select id="unit">
+        <option value="kg">kg</option>
+        <option value="l">l</option>
+      </select>
+      <button id="searchBtn" style="margin-left:12px;padding:8px 12px;">Search best price</button>
+    </div>
 
-    <section class="card">
-      <h2 style="margin:0 0 10px 0">Search</h2>
-      <form class="grid" onsubmit="return false;">
-        <div>
-          <label for="item">Item to search</label>
-          <input id="item" class="input" placeholder="e.g. Milk" required />
-        </div>
-
-        <div>
-          <label for="qty">Quantity</label>
-          <div style="display:flex; gap:8px;">
-            <input id="qty" type="number" min="1" value="1" class="input" style="flex:1" />
-            <select id="unitSelect" class="small">
-              <option value="kg">kg</option>
-              <option value="l">l</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label for="place">Place (city)</label>
-          <input id="place" class="input" placeholder="e.g. Hyderabad" />
-        </div>
-
-        <div>
-          <label for="pin">Pincode</label>
-          <input id="pin" class="input" placeholder="e.g. 500081" />
-        </div>
-
-        <div style="grid-column:1/-1; display:flex; gap:8px; margin-top:6px;">
-          <div style="flex:1"><button id="searchBtn" class="primary" type="button">Search best price</button></div>
-          <div style="display:flex;gap:8px;">
-            <button id="resetBtn" class="small" type="button">Reset</button>
-          </div>
-        </div>
-      </form>
-
-      <div id="results" class="result-list"></div>
-      <div class="hint">Click a marketplace to open its site with the search applied.</div>
-    </section>
+    <div id="results"></div>
   </div>
 
   <script>
-    const statusText = document.getElementById("statusText");
-    function setStatus(msg, ok=true){ statusText.textContent = msg; statusText.style.color = ok?"#8ff":"#ffb3b3"; }
+  // Minimal, self-contained script. No external files.
+  (function(){
+    const status = document.getElementById('status');
+    function setStatus(s){ status.textContent = s; }
 
+    // dataset (correct URL templates)
     const PRICES = {
       "milk": [
         { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
@@ -114,54 +52,46 @@
       ]
     };
 
-    function buildQueryText(item, qty, unit){
-      const it = item.trim();
-      if (!qty) return it;
-      if (/(kg|l|litre|liter|ltr)/i.test(it)) return it;
-      const ut = unit==="l" ? (qty+" l") : (qty+" kg");
-      return it+" "+ut;
+    function qtext(item, qty, unit){
+      item = (item||'').trim();
+      if(!item) return '';
+      if(/(kg|l|ltr|litre|liter)/i.test(item)) return item;
+      return item + ' ' + (unit==='l' ? qty + ' l' : qty + ' kg');
     }
-    function buildSearchLink(template, itemQuery, qty, unit){
-      const q = encodeURIComponent(buildQueryText(itemQuery, qty, unit));
-      return template.replace("{query}", q);
+    function buildLink(template,item,qty,unit){
+      return template.replace('{query}', encodeURIComponent(qtext(item,qty,unit)));
     }
-    function findPricesFor(itemName){
-      const keyExact = itemName.trim().toLowerCase();
-      if (PRICES[keyExact]) return PRICES[keyExact];
-      for (const k in PRICES){ if (k.includes(keyExact) || keyExact.includes(k)) return PRICES[k]; }
+    function find(item){
+      const key = (item||'').trim().toLowerCase();
+      if(PRICES[key]) return PRICES[key].slice();
+      // contains match
+      for(const k in PRICES) if(k.includes(key) || key.includes(k)) return PRICES[k].slice();
       return null;
     }
-    function renderResults(list,itemQuery,qty,unit){
-      const c=document.getElementById("results"); c.innerHTML="";
-      if(!list){ c.innerHTML="<div class='hint'>No prices found. Try editing dataset.</div>"; return;}
+
+    function render(list,item,qty,unit){
+      const out = document.getElementById('results'); out.innerHTML = '';
+      if(!list){ out.innerHTML = '<div class="card">No prices found (try "milk" or "quick sugar 1kg").</div>'; return; }
       list.sort((a,b)=>a.price-b.price);
-      for(const entry of list){
-        const row=document.createElement("div"); row.className="row";
-        const left=document.createElement("div"); left.innerHTML=`<div class="price">₹ ${entry.price}</div><div class="meta">${entry.marketplace}</div>`;
-        const right=document.createElement("div"); right.className="market-links";
-        const btn=document.createElement("a"); btn.className="market"; btn.innerText="Open";
-        btn.href=buildSearchLink(entry.url_template,itemQuery,qty,unit); btn.target="_blank";
-        right.appendChild(btn); row.appendChild(left); row.appendChild(right); c.appendChild(row);
-      }
+      list.forEach(e=>{
+        const r = document.createElement('div'); r.className = 'row';
+        r.innerHTML = '<div><span class="price">₹'+e.price+'</span> &nbsp;<span style="color:#667085">'+e.marketplace+'</span></div>';
+        const a = document.createElement('a'); a.className='market'; a.href = buildLink(e.url_template,item,qty,unit); a.target='_blank'; a.textContent = 'Open';
+        r.appendChild(a); out.appendChild(r);
+      });
     }
 
-    document.getElementById("searchBtn").addEventListener("click",()=>{
-      const item=document.getElementById("item").value;
-      const qty=document.getElementById("qty").value||1;
-      const unit=document.getElementById("unitSelect").value||"kg";
-      if(!item){alert("Enter an item");return;}
-      const found=findPricesFor(item);
-      renderResults(found,item,qty,unit);
-    });
-    document.getElementById("resetBtn").addEventListener("click",()=>{
-      document.getElementById("item").value="";
-      document.getElementById("qty").value=1;
-      document.getElementById("place").value="";
-      document.getElementById("pin").value="";
-      document.getElementById("results").innerHTML="";
+    document.getElementById('searchBtn').addEventListener('click', ()=>{
+      const item = document.getElementById('item').value || '';
+      const qty = document.getElementById('qty').value || 1;
+      const unit = document.getElementById('unit').value || 'kg';
+      if(!item.trim()){ alert('Please enter an item'); return; }
+      const found = find(item);
+      render(found, item, qty, unit);
     });
 
-    window.addEventListener("load",()=>{setStatus("loaded — dataset keys: "+Object.keys(PRICES).join(", "));});
+    window.addEventListener('load', ()=> setStatus('loaded — dataset keys: '+Object.keys(PRICES).join(', ')));
+  })();
   </script>
 </body>
 </html>
