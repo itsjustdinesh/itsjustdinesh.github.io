@@ -110,16 +110,41 @@
       // Use these templates in your PRICES object
 const PRICES = {
   "milk": [
-    { marketplace: "BigBasket", price: 50, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
-    { marketplace: "Zepto",     price: 55, url_template: "https://www.zepto.com/search?query={query}" },
-    { marketplace: "Blinkit",   price: 60, url_template: "https://blinkit.com/s/?q={query}" }
+    {
+      marketplace: "BigBasket",
+      price: 50,
+      url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as"
+    },
+    {
+      marketplace: "Zepto",
+      price: 55,
+      url_template: "https://www.zepto.com/search?query={query}"
+    },
+    {
+      marketplace: "Blinkit",
+      price: 60,
+      url_template: "https://blinkit.com/s/?q={query}"
+    }
   ],
   "quick sugar 1kg": [
-    { marketplace: "BigBasket", price: 80, url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as" },
-    { marketplace: "Zepto",     price: 100, url_template: "https://www.zepto.com/search?query={query}" },
-    { marketplace: "Blinkit",   price: 110, url_template: "https://blinkit.com/s/?q={query}" }
+    {
+      marketplace: "BigBasket",
+      price: 80,
+      url_template: "https://www.bigbasket.com/ps/?q={query}&nc=as"
+    },
+    {
+      marketplace: "Zepto",
+      price: 100,
+      url_template: "https://www.zepto.com/search?query={query}"
+    },
+    {
+      marketplace: "Blinkit",
+      price: 110,
+      url_template: "https://blinkit.com/s/?q={query}"
+    }
   ]
 };
+
       const MARKETPLACE_FALLBACK = [
         { marketplace: "BigBasket", url_template: "https://www.bigbasket.com/catalogsearch/result/?q={query}", app_scheme: "bigbasket://search?q={query}", intent_host: "com.bigbasket.app" },
         { marketplace: "Zepto", url_template: "https://www.zepto.com/search?q={query}", app_scheme: "zepto://search?q={query}", intent_host: "in.zepto.app" },
